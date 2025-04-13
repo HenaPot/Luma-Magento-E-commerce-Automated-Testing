@@ -7,8 +7,8 @@ class ProductDetailPage extends Page {
         return $('body');
     }
 
-    open (product_parameter_url) {
-        return super.open(product_parameter_url);
+    get productQuantityInput () {
+        return $('input[name="qty"][id="qty"][title="Qty"]');
     }
 
     async selectProductSize (size) {
@@ -21,14 +21,14 @@ class ProductDetailPage extends Page {
         await colorOption.click();
     }
     
-    get productQuantityInput () {
-        return $('input[name="qty"][id="qty"][title="Qty"]');
-    }
-    
     async addToCart () {
         const addToCartButton = $('#product-addtocart-button');
         await addToCartButton.waitForClickable({ timeout: 3000 });
         await addToCartButton.click();
+    }
+
+    open (product_parameter_url) {
+        return super.open(product_parameter_url);
     }
 }
 
