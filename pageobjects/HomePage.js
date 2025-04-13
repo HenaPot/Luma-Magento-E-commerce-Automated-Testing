@@ -6,12 +6,6 @@ class HomePage extends Page {
         return $('#search');
     }
 
-    async searchProducts (search) {
-        await this.searchProductsInput.setValue(search);
-        await browser.keys('Enter');
-        await browser.pause(4000)
-    }
-
     get searchBtnSubmit () {
         return $('button[type="submit" and title="Search"]');
     }
@@ -20,6 +14,12 @@ class HomePage extends Page {
         return $('.item.product.product-item');
     }
 
+    async searchProducts (search) {
+        await this.searchProductsInput.setValue(search);
+        await browser.keys('Enter');
+        await browser.pause(4000)
+    }
+    
     open () {
         return super.open("what-is-new.html");
     }
