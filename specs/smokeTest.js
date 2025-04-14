@@ -1,4 +1,3 @@
-import { expect } from '@wdio/globals'
 import HomePage from '../pageobjects/HomePage.js'
 import smokeTestData from '../test_data/smokeTestData.js'
 import ProductDetailPage from '../pageobjects/ProductDetailPage.js'
