@@ -1,19 +1,37 @@
-import { $ } from '@wdio/globals'
-import Page from './Page.js';
+import { $ } from "@wdio/globals";
+import Page from "./Page.js";
 
 class HomePage extends Page {
+  get loginBtn() {
+    return $(
+      'a[href="https://magento.softwaretestingboard.com/customer/account/login/referer/aHR0cHM6Ly9tYWdlbnRvLnNvZnR3YXJldGVzdGluZ2JvYXJkLmNvbS93aGF0LWlzLW5ldy5odG1s/"]'
+    );
+  }
 
-    get loginBtn () {
-        return $('a[href="https://magento.softwaretestingboard.com/customer/account/login/referer/aHR0cHM6Ly9tYWdlbnRvLnNvZnR3YXJldGVzdGluZ2JvYXJkLmNvbS93aGF0LWlzLW5ldy5odG1s/"]');
-    }
+  get welcomeText() {
+    return $("span[class=logged-in]");
+  }
 
-    get welcomeText() {
-        return $('span[class=logged-in]')
-    }
+  get searchProductsInput() {
+    return $("#search");
+  }
 
-    open () {
-        return super.open("what-is-new.html");
-    }
+  get searchBtnSubmit() {
+    return $('button[type="submit" and title="Search"]');
+  }
+
+  get firstSearchResult() {
+    return $(".product-item-link");
+  }
+
+  async searchProducts(search) {
+    await this.searchProductsInput.setValue(search);
+    await browser.keys("Enter");
+  }
+
+  open() {
+    return super.open("what-is-new.html");
+  }
 }
 
 export default new HomePage();
