@@ -16,6 +16,16 @@ const testData = {
     title: "What's New",
     url: "https://magento.softwaretestingboard.com/what-is-new.html",
   },
+  default_shipping_address: {
+    first_name: "Hena",
+    last_name: "Testing",
+    address: "Address",
+    city: "Sa",
+    zip_code: "38949234",
+    country: "United Arab Emirates",
+    phone_number: "9834789435",
+  },
+  order_success: "Thank you for your purchase!",
 };
 
 export default testData;

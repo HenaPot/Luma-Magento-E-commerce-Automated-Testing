@@ -9,7 +9,13 @@ class LoginPage extends Page {
   get inputPassword() {
     return $("#pass");
   }
+  get inputPassword() {
+    return $("#pass");
+  }
 
+  get signInBtn() {
+    return $("#send2");
+  }
   get signInBtn() {
     return $("#send2");
   }

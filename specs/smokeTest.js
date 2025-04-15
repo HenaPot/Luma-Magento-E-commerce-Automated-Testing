@@ -1,24 +1,24 @@
 import HomePage from "../pageobjects/HomePage.js";
 import LoginPage from "../pageobjects/LoginPage.js";
-import testData from "../test_data/testData.js";
 import ProductDetailPage from "../pageobjects/ProductDetailPage.js";
+import CheckoutPage from "../pageobjects/CheckoutPage.js";
+import SuccessPurchasePage from "../pageobjects/SuccessPurchasePage.js";
+import testData from "../test_data/testData.js";
 import AssertionUtil from "../utils/AssertionUtil.js";
-import WaitUtil from "../utils/WaitUtil.js";
+import ElementUtil from "../utils/ElementUtil.js";
 
 describe("Smoke Test: Buying Products Full Flow", () => {
   it("should successfully log in user", async () => {
     await HomePage.open();
-    await HomePage.loginBtn.waitForClickable();
-    await HomePage.loginBtn.click();
+    await ElementUtil.waitAndClick(HomePage.loginBtn);
 
     await LoginPage.inputEmail.waitForDisplayed();
     await LoginPage.inputEmail.setValue(testData.user_credentials.email);
     await LoginPage.inputPassword.setValue(testData.user_credentials.password);
-    await LoginPage.signInBtn.click();
+    await ElementUtil.waitAndClick(LoginPage.signInBtn);
 
-    const welcomeText = await HomePage.welcomeText.getText();
     AssertionUtil.assertTextMatches(
-      welcomeText,
+      await HomePage.welcomeText.getText(),
       `Welcome, ${testData.user_credentials.full_name}!`
     );
   });
@@ -30,14 +30,11 @@ describe("Smoke Test: Buying Products Full Flow", () => {
     await AssertionUtil.assertTitleMatches(testData.homepage.title);
 
     await HomePage.searchProducts(testData.smoke_search_query);
-    await HomePage.firstSearchResult.waitForClickable();
-    await HomePage.firstSearchResult.click();
+    await ElementUtil.waitAndClick(HomePage.firstSearchResult);
 
     await ProductDetailPage.productDetailBody.waitForDisplayed();
-    const productDetailText =
-      await ProductDetailPage.productDetailBody.getText();
     AssertionUtil.assertTextContainedIgnoreCase(
-      productDetailText,
+      await ProductDetailPage.productDetailBody.getText(),
       testData.smoke_search_query
     );
   });
@@ -51,19 +48,18 @@ describe("Smoke Test: Buying Products Full Flow", () => {
 
     await ProductDetailPage.selectProductSize(testData.smoke_product.size);
     await ProductDetailPage.selectProductColor(testData.smoke_product.color);
-    const productQuantityText =
-      await ProductDetailPage.productQuantityInput.getValue();
+
     AssertionUtil.assertTextMatches(
-      productQuantityText,
+      await ProductDetailPage.productQuantityInput.getValue(),
       testData.smoke_product.default_quantity
     );
 
     await ProductDetailPage.addToCart();
-    await WaitUtil.waitUntilCondition(async () => {
-      const successMessage = await ProductDetailPage.successMessage.getText();
+    await browser.waitUntil(async () => {
+      await ProductDetailPage.successMessage.waitForDisplayed();
       try {
         AssertionUtil.assertTextContains(
-          successMessage,
+          await ProductDetailPage.successMessage.getText(),
           "You added " + testData.smoke_product.title
         );
         return true;
@@ -71,5 +67,30 @@ describe("Smoke Test: Buying Products Full Flow", () => {
         return false;
       }
     });
+  });
+
+  it("should complete checkout with configured product", async () => {
+    await HomePage.open();
+
+    const cartIcon = await HomePage.shoppingCartIcon();
+    await ElementUtil.waitAndClick(cartIcon);
+
+    await ElementUtil.waitAndClick(HomePage.proceedToCheckoutButton);
+
+    await ElementUtil.waitAndClick(CheckoutPage.getNextButton);
+
+    await ElementUtil.waitAndClick(CheckoutPage.placeOrderButton);
+
+    await browser.waitUntil(
+      async () =>
+        (await browser.getUrl()) ===
+        "https://magento.softwaretestingboard.com/checkout/onepage/success/"
+    );
+
+    await SuccessPurchasePage.getSuccessText.waitForDisplayed();
+    AssertionUtil.assertTextMatches(
+      await SuccessPurchasePage.getSuccessText.getText(),
+      testData.order_success
+    );
   });
 });

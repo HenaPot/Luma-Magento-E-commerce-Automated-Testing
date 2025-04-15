@@ -2,6 +2,10 @@ import { $ } from "@wdio/globals";
 import Page from "./Page.js";
 
 class HomePage extends Page {
+  get proceedToCheckoutButton() {
+    return $("#top-cart-btn-checkout");
+  }
+
   get loginBtn() {
     return $(
       'a[href="https://magento.softwaretestingboard.com/customer/account/login/referer/aHR0cHM6Ly9tYWdlbnRvLnNvZnR3YXJldGVzdGluZ2JvYXJkLmNvbS93aGF0LWlzLW5ldy5odG1s/"]'
@@ -28,7 +32,11 @@ class HomePage extends Page {
     await this.searchProductsInput.setValue(search);
     await browser.keys("Enter");
   }
-
+  async shoppingCartIcon() {
+    const cartIcon = await $("span.counter-number");
+    await cartIcon.waitForClickable({ timeout: 5000 });
+    return cartIcon;
+  }
   open() {
     return super.open("what-is-new.html");
   }
