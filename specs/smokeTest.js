@@ -1,7 +1,9 @@
+import { browser } from '@wdio/globals'
 import HomePage from '../pageobjects/HomePage.js'
 import smokeTestData from '../test_data/smokeTestData.js'
 import ProductDetailPage from '../pageobjects/ProductDetailPage.js'
 import AssertionUtil from '../utils/AssertionUtil.js'
+import WaitUtil from '../utils/WaitUtil.js'
 
 describe('Smoke Test: Buying Products Full Flow', () => {
 
@@ -13,6 +15,9 @@ describe('Smoke Test: Buying Products Full Flow', () => {
 
         await HomePage.searchProducts(smokeTestData.search_query);
         await HomePage.firstSearchResult.waitForDisplayed({ timeout: 5000 });
+
+        await WaitUtil.waitUntilClickable(HomePage.firstSearchResult, 'First search result was not clickable in time');
+
         await HomePage.firstSearchResult.click();
         await ProductDetailPage.productDetailBody.waitForDisplayed({ timeout: 5000 });
 
@@ -27,17 +32,20 @@ describe('Smoke Test: Buying Products Full Flow', () => {
 
         await ProductDetailPage.selectProductSize(smokeTestData.product.size); 
         await ProductDetailPage.selectProductColor(smokeTestData.product.color);
-
         const productQuantityText = await ProductDetailPage.productQuantityInput.getValue();
         AssertionUtil.assertTextMatches(productQuantityText, smokeTestData.product.default_quantity);
 
         await ProductDetailPage.addToCart();
-        await browser.pause(2000); 
-
-        const productDetailText = await ProductDetailPage.productDetailBody.getText();
-        AssertionUtil.assertTextContains(productDetailText, "You added " + smokeTestData.product.name);
-
+        await WaitUtil.waitUntilCondition(async () => {
+            const successMessage = await ProductDetailPage.successMessage.getText();
+            try {
+                AssertionUtil.assertTextContains(successMessage, "You added " + smokeTestData.product.name);
+                return true;
+            } catch {
+                return false;
+            }
+        });
+        
     })
 
 })
-

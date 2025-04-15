@@ -7,6 +7,10 @@ class ProductDetailPage extends Page {
         return $('body');
     }
 
+    get successMessage () {
+        return $('div[data-bind="html: $parent.prepareMessageForHtml(message.text)"]')
+    }
+
     get productQuantityInput () {
         return $('input[name="qty"][id="qty"][title="Qty"]');
     }

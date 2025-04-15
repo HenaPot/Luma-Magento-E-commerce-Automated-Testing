@@ -17,7 +17,6 @@ class HomePage extends Page {
     async searchProducts (search) {
         await this.searchProductsInput.setValue(search);
         await browser.keys('Enter');
-        await browser.pause(4000)
     }
     
     open () {
