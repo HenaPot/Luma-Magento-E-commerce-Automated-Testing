@@ -1,3 +1,5 @@
+LUMA MAGETNO E-COMMERCE AUTOMATED TESTING
+
 - Technologies Used
 
 Languages & Frameworks: JavaScript, WebdriverIO, Jasmine

@@ -1,5 +1,6 @@
 import { $ } from "@wdio/globals";
 import Page from "./Page.js";
+import CommonUtil from "../utils/CommonUtil.js";
 
 class ProductDetailPage extends Page {
   get productDetailBody() {
@@ -17,23 +18,18 @@ class ProductDetailPage extends Page {
   }
 
   async selectProductSize(size) {
-    const sizeOption = $(
-      `//div[contains(@class, "swatch-option") and @option-label="${size}"]`
-    );
-    await sizeOption.click();
+    const sizeOption = $(`div.swatch-option[option-label="${size}"]`);
+    await CommonUtil.waitAndClick(sizeOption);
   }
 
   async selectProductColor(color) {
-    const colorOption = $(
-      `//div[contains(@class, "swatch-option") and @option-label="${color}"]`
-    );
-    await colorOption.click();
+    const colorOption = $(`div.swatch-option[option-label="${color}"]`);
+    await CommonUtil.waitAndClick(colorOption);
   }
 
   async addToCart() {
     const addToCartButton = $("#product-addtocart-button");
-    await addToCartButton.waitForClickable({ timeout: 3000 });
-    await addToCartButton.click();
+    await CommonUtil.waitAndClick(addToCartButton);
   }
 
   open(product_parameter_url) {
