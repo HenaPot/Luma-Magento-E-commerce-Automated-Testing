@@ -14,18 +14,29 @@ const testData = {
   },
   homepage: {
     title: "What's New",
-    url: "https://magento.softwaretestingboard.com/what-is-new.html",
+    url_parameter: "what-is-new.html",
   },
-  default_shipping_address: {
-    first_name: "Hena",
-    last_name: "Testing",
-    address: "Address",
-    city: "Sa",
-    zip_code: "38949234",
-    country: "United Arab Emirates",
-    phone_number: "9834789435",
+  shipping: {
+    url_parameter: "checkout/#shipping",
+    section_title: "Shipping Address",
+    default_shipping_address: {
+      first_name: "Hena",
+      last_name: "Testing",
+      address: "Address",
+      city: "Sa",
+      zip_code: "38949234",
+      country: "United Arab Emirates",
+      phone_number: "9834789435",
+    },
   },
-  order_success: "Thank you for your purchase!",
+  payment: {
+    url_parameter: "checkout/#payment",
+    section_title: "Payment Method",
+  },
+  success_page: {
+    url_parameter: "checkout/onepage/success/",
+    success_message: "Thank you for your purchase!",
+  },
 };
 
 export default testData;

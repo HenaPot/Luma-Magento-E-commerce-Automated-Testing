@@ -1,7 +1,8 @@
 import HomePage from "../pageobjects/HomePage.js";
 import LoginPage from "../pageobjects/LoginPage.js";
 import ProductDetailPage from "../pageobjects/ProductDetailPage.js";
-import CheckoutPage from "../pageobjects/CheckoutPage.js";
+import ShippingPage from "../pageobjects/ShippingPage.js";
+import PaymentsPage from "../pageobjects/PaymentsPage.js";
 import SuccessPurchasePage from "../pageobjects/SuccessPurchasePage.js";
 import testData from "../test_data/testData.js";
 import AssertionUtil from "../utils/AssertionUtil.js";
@@ -10,12 +11,14 @@ import ElementUtil from "../utils/ElementUtil.js";
 describe("Smoke Test: Buying Products Full Flow", () => {
   it("should successfully log in user", async () => {
     await HomePage.open();
-    await ElementUtil.waitAndClick(HomePage.loginBtn);
+    await ElementUtil.waitAndClick(HomePage.signInButton);
 
     await LoginPage.inputEmail.waitForDisplayed();
     await LoginPage.inputEmail.setValue(testData.user_credentials.email);
     await LoginPage.inputPassword.setValue(testData.user_credentials.password);
     await ElementUtil.waitAndClick(LoginPage.signInBtn);
+
+    await HomePage.welcomeText.waitForDisplayed();
 
     AssertionUtil.assertTextMatches(
       await HomePage.welcomeText.getText(),
@@ -26,8 +29,10 @@ describe("Smoke Test: Buying Products Full Flow", () => {
   it("should yield relevant product search", async () => {
     await HomePage.open();
 
-    await AssertionUtil.assertUrlMatches(testData.homepage.url);
-    await AssertionUtil.assertTitleMatches(testData.homepage.title);
+    await AssertionUtil.assertUrlAndElement(
+      testData.homepage.url_parameter,
+      testData.homepage.title
+    );
 
     await HomePage.searchProducts(testData.smoke_search_query);
     await ElementUtil.waitAndClick(HomePage.firstSearchResult);
@@ -41,10 +46,11 @@ describe("Smoke Test: Buying Products Full Flow", () => {
 
   it("should select product details and add it to cart", async () => {
     await ProductDetailPage.open(testData.smoke_product.url_parameter);
-    await AssertionUtil.assertUrlMatches(
-      `https://magento.softwaretestingboard.com/${testData.smoke_product.url_parameter}`
+
+    await AssertionUtil.assertUrlAndElement(
+      testData.smoke_product.url_parameter,
+      testData.smoke_product.title
     );
-    await AssertionUtil.assertTitleContains(testData.smoke_product.title);
 
     await ProductDetailPage.selectProductSize(testData.smoke_product.size);
     await ProductDetailPage.selectProductColor(testData.smoke_product.color);
@@ -58,7 +64,7 @@ describe("Smoke Test: Buying Products Full Flow", () => {
     await browser.waitUntil(async () => {
       await ProductDetailPage.successMessage.waitForDisplayed();
       try {
-        AssertionUtil.assertTextContains(
+        AssertionUtil.assertTextContain(
           await ProductDetailPage.successMessage.getText(),
           "You added " + testData.smoke_product.title
         );
@@ -74,23 +80,30 @@ describe("Smoke Test: Buying Products Full Flow", () => {
 
     const cartIcon = await HomePage.shoppingCartIcon();
     await ElementUtil.waitAndClick(cartIcon);
-
     await ElementUtil.waitAndClick(HomePage.proceedToCheckoutButton);
 
-    await ElementUtil.waitAndClick(CheckoutPage.getNextButton);
-
-    await ElementUtil.waitAndClick(CheckoutPage.placeOrderButton);
-
-    await browser.waitUntil(
-      async () =>
-        (await browser.getUrl()) ===
-        "https://magento.softwaretestingboard.com/checkout/onepage/success/"
+    await AssertionUtil.assertUrlAndElement(
+      testData.shipping.url_parameter,
+      testData.shipping.section_title,
+      ShippingPage.shippingTitle
+    );
+    await AssertionUtil.assertJsonContainsInElement(
+      ShippingPage.defaultShippingAddress,
+      testData.shipping.default_shipping_address
     );
 
-    await SuccessPurchasePage.getSuccessText.waitForDisplayed();
-    AssertionUtil.assertTextMatches(
-      await SuccessPurchasePage.getSuccessText.getText(),
-      testData.order_success
+    await ElementUtil.waitAndClick(ShippingPage.nextButton);
+    await AssertionUtil.assertUrlAndElement(
+      testData.payment.url_parameter,
+      testData.payment.section_title,
+      PaymentsPage.paymentTitle
+    );
+
+    await ElementUtil.waitAndClick(PaymentsPage.placeOrderButton);
+    await AssertionUtil.assertUrlAndElement(
+      testData.success_page.url_parameter,
+      testData.success_page.success_message,
+      SuccessPurchasePage.successMessage
     );
   });
 });

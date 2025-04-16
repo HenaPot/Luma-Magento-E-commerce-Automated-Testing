@@ -1,9 +1,9 @@
 import { $ } from "@wdio/globals";
 import Page from "./Page.js";
 
-class CheckoutPage extends Page {
-  get getNextButton() {
-    return $('button[data-role="opc-continue"]');
+class PaymentsPage extends Page {
+  get paymentTitle() {
+    return $("//div[text()='Payment Method']");
   }
 
   get placeOrderButton() {
@@ -11,4 +11,4 @@ class CheckoutPage extends Page {
   }
 }
 
-export default new CheckoutPage();
+export default new PaymentsPage();

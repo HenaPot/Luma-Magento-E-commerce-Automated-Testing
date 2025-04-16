@@ -2,7 +2,7 @@ import { $ } from "@wdio/globals";
 import Page from "./Page.js";
 
 class SuccessPurchasePage extends Page {
-  get getSuccessText() {
+  get successMessage() {
     return $("//span[@class='base' and @data-ui-id='page-title-wrapper']");
   }
 }
