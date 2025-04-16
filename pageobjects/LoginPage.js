@@ -14,10 +14,10 @@ class LoginPage extends Page {
     return $("#send2");
   }
 
-  async login(username, password) {
+  async enterSignInData(username, password) {
+    await this.inputEmail.waitForDisplayed();
     await this.inputEmail.setValue(username);
     await this.inputPassword.setValue(password);
-    await this.signInBtn.click();
   }
 }
 

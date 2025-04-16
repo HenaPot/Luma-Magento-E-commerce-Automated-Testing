@@ -1,24 +1,24 @@
 import HomePage from "../pageobjects/HomePage.js";
-import LoginPage from "../pageobjects/LoginPage.js";
 import ProductDetailPage from "../pageobjects/ProductDetailPage.js";
 import ShippingPage from "../pageobjects/ShippingPage.js";
 import PaymentsPage from "../pageobjects/PaymentsPage.js";
 import SuccessPurchasePage from "../pageobjects/SuccessPurchasePage.js";
 import testData from "../test_data/testData.js";
 import AssertionUtil from "../utils/AssertionUtil.js";
-import ElementUtil from "../utils/ElementUtil.js";
+import CommonUtil from "../utils/CommonUtil.js";
+import AuthUtil from "../utils/AuthUtil.js";
+import SearchUtil from "../utils/SearchUtil.js";
+import ProductDetailUtil from "../utils/ProductDetailUtil.js";
+import CheckoutUtil from "../utils/CheckoutUtil.js";
 
 describe("Smoke Test: Buying Products Full Flow", () => {
   it("should successfully log in user", async () => {
     await HomePage.open();
-    await ElementUtil.waitAndClick(HomePage.signInButton);
 
-    await LoginPage.inputEmail.waitForDisplayed();
-    await LoginPage.inputEmail.setValue(testData.user_credentials.email);
-    await LoginPage.inputPassword.setValue(testData.user_credentials.password);
-    await ElementUtil.waitAndClick(LoginPage.signInBtn);
-
-    await HomePage.welcomeText.waitForDisplayed();
+    await AuthUtil.signIn(
+      testData.user_credentials.email,
+      testData.user_credentials.password
+    );
 
     AssertionUtil.assertTextMatches(
       await HomePage.welcomeText.getText(),
@@ -34,10 +34,8 @@ describe("Smoke Test: Buying Products Full Flow", () => {
       testData.homepage.title
     );
 
-    await HomePage.searchProducts(testData.smoke_search_query);
-    await ElementUtil.waitAndClick(HomePage.firstSearchResult);
+    await SearchUtil.searchAndGetFirstResult(testData.smoke_search_query);
 
-    await ProductDetailPage.productDetailBody.waitForDisplayed();
     AssertionUtil.assertTextContainedIgnoreCase(
       await ProductDetailPage.productDetailBody.getText(),
       testData.smoke_search_query
@@ -52,8 +50,10 @@ describe("Smoke Test: Buying Products Full Flow", () => {
       testData.smoke_product.title
     );
 
-    await ProductDetailPage.selectProductSize(testData.smoke_product.size);
-    await ProductDetailPage.selectProductColor(testData.smoke_product.color);
+    await ProductDetailUtil.selectSizeAndColor(
+      testData.smoke_product.size,
+      testData.smoke_product.color
+    );
 
     AssertionUtil.assertTextMatches(
       await ProductDetailPage.productQuantityInput.getValue(),
@@ -61,45 +61,35 @@ describe("Smoke Test: Buying Products Full Flow", () => {
     );
 
     await ProductDetailPage.addToCart();
-    await browser.waitUntil(async () => {
-      await ProductDetailPage.successMessage.waitForDisplayed();
-      try {
-        AssertionUtil.assertTextContain(
-          await ProductDetailPage.successMessage.getText(),
-          "You added " + testData.smoke_product.title
-        );
-        return true;
-      } catch {
-        return false;
-      }
-    });
+    await AssertionUtil.assertWaitElementTextContain(
+      ProductDetailPage.successMessage,
+      "You added " + testData.smoke_product.title
+    );
   });
 
   it("should complete checkout with configured product", async () => {
     await HomePage.open();
 
-    const cartIcon = await HomePage.shoppingCartIcon();
-    await ElementUtil.waitAndClick(cartIcon);
-    await ElementUtil.waitAndClick(HomePage.proceedToCheckoutButton);
-
+    await CheckoutUtil.proceedToCheckout();
     await AssertionUtil.assertUrlAndElement(
       testData.shipping.url_parameter,
       testData.shipping.section_title,
       ShippingPage.shippingTitle
     );
+
     await AssertionUtil.assertJsonContainsInElement(
       ShippingPage.defaultShippingAddress,
       testData.shipping.default_shipping_address
     );
 
-    await ElementUtil.waitAndClick(ShippingPage.nextButton);
+    await CommonUtil.waitAndClick(ShippingPage.nextButton);
     await AssertionUtil.assertUrlAndElement(
       testData.payment.url_parameter,
       testData.payment.section_title,
       PaymentsPage.paymentTitle
     );
 
-    await ElementUtil.waitAndClick(PaymentsPage.placeOrderButton);
+    await CommonUtil.waitAndClick(PaymentsPage.placeOrderButton);
     await AssertionUtil.assertUrlAndElement(
       testData.success_page.url_parameter,
       testData.success_page.success_message,

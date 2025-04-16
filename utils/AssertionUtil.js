@@ -1,6 +1,20 @@
 import { browser, expect } from "@wdio/globals";
 
 class AssertionUtil {
+  static assertTextMatches(actualText, expectedText) {
+    expect(actualText).toBe(
+      expectedText,
+      `Expected text "${expectedText}" not found in "${actualText}"`
+    );
+  }
+
+  static assertTextContain(actualText, expectedText) {
+    expect(actualText).toContain(
+      expectedText,
+      `Expected text "${expectedText}" not found in "${actualText}"`
+    );
+  }
+
   static assertTextContainedIgnoreCase(actualText, expectedText) {
     expect(actualText.toLowerCase()).toContain(
       expectedText.toLowerCase(),
@@ -46,18 +60,19 @@ class AssertionUtil {
     }
   }
 
-  static assertTextMatches(actualText, expectedText) {
-    expect(actualText).toBe(
-      expectedText,
-      `Expected text "${expectedText}" not found in "${actualText}"`
-    );
-  }
-
-  static assertTextContain(actualText, expectedText) {
-    expect(actualText).toContain(
-      expectedText,
-      `Expected text "${expectedText}" not found in "${actualText}"`
-    );
+  static async assertWaitElementTextContain(element, expectedTextContain) {
+    await browser.waitUntil(async () => {
+      await element.waitForDisplayed();
+      try {
+        AssertionUtil.assertTextContain(
+          await element.getText(),
+          expectedTextContain
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    });
   }
 }
 
